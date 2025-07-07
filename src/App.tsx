@@ -9,6 +9,7 @@ import PitScouting from "./pages/PitScouting";
 import MatchScouting from "./pages/MatchScouting";
 import Survey from "./pages/Survey";
 import MatchScout from "./pages/MatchScout";
+import PitScoutingSummary from "./pages/PitScoutingSummary";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/pit-scouting" element={<PitScouting />} />
           <Route path="/pit-scouting/survey/:teamId" element={<Survey />} />
+          <Route path="/pit-scouting/summary/:entryId" element={<PitScoutingSummary />} />
           <Route path="/match-scouting" element={<MatchScouting />} />
           <Route path="/match-scouting/scout/:matchId" element={<MatchScout />} />
           <Route path="*" element={<NotFound />} />
