@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, Users } from 'lucide-react';
@@ -19,75 +19,54 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface Team {
+  teamNumber: string;
+  teamName: string;
+}
+
 const PitScoutingSummary = () => {
   const navigate = useNavigate();
   const { entryId } = useParams();
+  const [teams, setTeams] = useState<Team[]>([]);
 
-  // Get the entry data from localStorage or state management
-  // For now, we'll use mock structure but with empty fields as requested
-  const entryData = {
-    teamNumber: "",
-    teamName: "",
-    drivetrainType: "",
-    autonomousCapability: ""
-  };
+  useEffect(() => {
+    const savedTeams = localStorage.getItem('eventTeams');
+    if (savedTeams) {
+      setTeams(JSON.parse(savedTeams));
+    }
+  }, []);
 
-  // Create tables with empty fields for team numbers and names
+  // Create tables using actual team data
   const tables = [
     {
       id: 1,
-      title: "Table 1",
-      columns: ["Team Number", "Team Name", "Auto"],
-      data: [
-        { teamNumber: "", teamName: "", auto: "95" },
-        { teamNumber: "", teamName: "", auto: "85" },
-        { teamNumber: "", teamName: "", auto: "75" },
-        { teamNumber: "", teamName: "", auto: "70" }
-      ]
+      title: "Auto Performance Ranking",
+      columns: ["Team Number", "Team Name", "Auto Score"],
+      dataKey: "auto"
     },
     {
       id: 2,
-      title: "Table 2", 
-      columns: ["Team Number", "Team Name", "TeleOp"],
-      data: [
-        { teamNumber: "", teamName: "", teleop: "92" },
-        { teamNumber: "", teamName: "", teleop: "89" },
-        { teamNumber: "", teamName: "", teleop: "77" },
-        { teamNumber: "", teamName: "", teleop: "68" }
-      ]
+      title: "TeleOp Performance Ranking", 
+      columns: ["Team Number", "Team Name", "TeleOp Score"],
+      dataKey: "teleop"
     },
     {
       id: 3,
-      title: "Table 3",
-      columns: ["Team Number", "Team Name", "Endgame"],
-      data: [
-        { teamNumber: "", teamName: "", endgame: "85" },
-        { teamNumber: "", teamName: "", endgame: "82" },
-        { teamNumber: "", teamName: "", endgame: "80" },
-        { teamNumber: "", teamName: "", endgame: "65" }
-      ]
+      title: "Endgame Performance Ranking",
+      columns: ["Team Number", "Team Name", "Endgame Score"],
+      dataKey: "endgame"
     },
     {
       id: 4,
-      title: "Table 5",
+      title: "Overall Team Rankings",
       columns: ["Team Number", "Team Name", "Compatibility Score", "Overall Score"],
-      data: [
-        { teamNumber: "", teamName: "", compatibility: "90", overall: "90" },
-        { teamNumber: "", teamName: "", compatibility: "88", overall: "85" },
-        { teamNumber: "", teamName: "", compatibility: "85", overall: "81" },
-        { teamNumber: "", teamName: "", compatibility: "80", overall: "75" }
-      ]
+      dataKey: "overall"
     },
     {
       id: 5,
-      title: "Table 6",
-      columns: ["Team Number", "Team Name", "Rank"],
-      data: [
-        { teamNumber: "", teamName: "", rank: "1" },
-        { teamNumber: "", teamName: "", rank: "2" },
-        { teamNumber: "", teamName: "", rank: "3" },
-        { teamNumber: "", teamName: "", rank: "4" }
-      ]
+      title: "Final Team Rankings",
+      columns: ["Team Number", "Team Name", "Final Rank"],
+      dataKey: "rank"
     }
   ];
 
@@ -95,7 +74,7 @@ const PitScoutingSummary = () => {
     <div className="min-h-screen bg-slate-900 text-white">
       {/* Header */}
       <div className="bg-slate-800 border-b border-slate-700">
-        <div className="max-w-md mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Button
@@ -108,7 +87,7 @@ const PitScoutingSummary = () => {
               </Button>
               <div>
                 <h1 className="text-xl font-bold">Summary Tables</h1>
-                <p className="text-sm text-slate-400">Swipe to navigate between tables</p>
+                <p className="text-sm text-slate-400">Swipe to navigate between ranking tables</p>
               </div>
             </div>
             <Users className="w-6 h-6 text-blue-400" />
@@ -116,9 +95,9 @@ const PitScoutingSummary = () => {
         </div>
       </div>
 
-      <div className="max-w-md mx-auto p-4">
+      <div className="max-w-4xl mx-auto p-4">
         <p className="text-center text-slate-400 mb-6 text-sm">
-          Use this table to rank all the teams at your competition.
+          Use these tables to rank and analyze all teams at your competition.
         </p>
 
         <Carousel className="w-full">
@@ -142,20 +121,34 @@ const PitScoutingSummary = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {table.data.map((row, index) => (
+                        {teams.slice(0, 8).map((team, index) => (
                           <TableRow key={index} className="border-slate-700">
-                            <TableCell className="text-white">{row.teamNumber}</TableCell>
-                            <TableCell className="text-white">{row.teamName}</TableCell>
+                            <TableCell className="text-white">{team.teamNumber}</TableCell>
+                            <TableCell className="text-white">{team.teamName}</TableCell>
                             <TableCell className="text-white">
-                              {(row as any)[Object.keys(row)[2]]}
+                              {/* Empty field for user to fill in */}
+                              <input 
+                                className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
+                                placeholder="-"
+                              />
                             </TableCell>
                             {table.columns.length > 3 && (
                               <TableCell className="text-white">
-                                {(row as any)[Object.keys(row)[3]]}
+                                <input 
+                                  className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
+                                  placeholder="-"
+                                />
                               </TableCell>
                             )}
                           </TableRow>
                         ))}
+                        {teams.length === 0 && (
+                          <TableRow className="border-slate-700">
+                            <TableCell colSpan={table.columns.length} className="text-center text-slate-400 py-8">
+                              No teams entered yet. Go back to Pit Scouting to add teams.
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </div>
@@ -175,9 +168,9 @@ const PitScoutingSummary = () => {
           </div>
           <Button
             className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => console.log('Generate Rank List')}
+            onClick={() => console.log('Generate Final Rankings')}
           >
-            Generate Rank List
+            Generate Final Rankings
           </Button>
         </div>
 
