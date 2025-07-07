@@ -23,28 +23,37 @@ const PitScoutingSummary = () => {
   const navigate = useNavigate();
   const { entryId } = useParams();
 
-  // Mock data for the five tables based on your image
+  // Get the entry data from localStorage or state management
+  // For now, we'll use mock structure but with empty fields as requested
+  const entryData = {
+    teamNumber: "",
+    teamName: "",
+    drivetrainType: "",
+    autonomousCapability: ""
+  };
+
+  // Create tables with empty fields for team numbers and names
   const tables = [
     {
       id: 1,
       title: "Table 1",
       columns: ["Team Number", "Team Name", "Auto"],
       data: [
-        { teamNumber: "7983", teamName: "TechVenture", auto: "95" },
-        { teamNumber: "8763", teamName: "Out of the Box", auto: "85" },
-        { teamNumber: "8079", teamName: "Out the Hat", auto: "75" },
-        { teamNumber: "5364", teamName: "Aperture Science", auto: "70" }
+        { teamNumber: "", teamName: "", auto: "95" },
+        { teamNumber: "", teamName: "", auto: "85" },
+        { teamNumber: "", teamName: "", auto: "75" },
+        { teamNumber: "", teamName: "", auto: "70" }
       ]
     },
     {
       id: 2,
-      title: "Table 2",
+      title: "Table 2", 
       columns: ["Team Number", "Team Name", "TeleOp"],
       data: [
-        { teamNumber: "7983", teamName: "TechVenture", teleop: "92" },
-        { teamNumber: "23045", teamName: "Out of the Box", teleop: "89" },
-        { teamNumber: "8079", teamName: "Out the Hat", teleop: "77" },
-        { teamNumber: "5364", teamName: "Aperture Science", teleop: "68" }
+        { teamNumber: "", teamName: "", teleop: "92" },
+        { teamNumber: "", teamName: "", teleop: "89" },
+        { teamNumber: "", teamName: "", teleop: "77" },
+        { teamNumber: "", teamName: "", teleop: "68" }
       ]
     },
     {
@@ -52,10 +61,10 @@ const PitScoutingSummary = () => {
       title: "Table 3",
       columns: ["Team Number", "Team Name", "Endgame"],
       data: [
-        { teamNumber: "7983", teamName: "TechVenture", endgame: "85" },
-        { teamNumber: "23045", teamName: "Aperture Science", endgame: "82" },
-        { teamNumber: "8079", teamName: "Out the Hat", endgame: "80" },
-        { teamNumber: "5364", teamName: "Aperture Science", endgame: "65" }
+        { teamNumber: "", teamName: "", endgame: "85" },
+        { teamNumber: "", teamName: "", endgame: "82" },
+        { teamNumber: "", teamName: "", endgame: "80" },
+        { teamNumber: "", teamName: "", endgame: "65" }
       ]
     },
     {
@@ -63,10 +72,10 @@ const PitScoutingSummary = () => {
       title: "Table 5",
       columns: ["Team Number", "Team Name", "Compatibility Score", "Overall Score"],
       data: [
-        { teamNumber: "7983", teamName: "TechVenture", compatibility: "90", overall: "90" },
-        { teamNumber: "23045", teamName: "Out of the Box", compatibility: "88", overall: "85" },
-        { teamNumber: "8079", teamName: "Out the Hat", compatibility: "85", overall: "81" },
-        { teamNumber: "5364", teamName: "Aperture Science", compatibility: "80", overall: "75" }
+        { teamNumber: "", teamName: "", compatibility: "90", overall: "90" },
+        { teamNumber: "", teamName: "", compatibility: "88", overall: "85" },
+        { teamNumber: "", teamName: "", compatibility: "85", overall: "81" },
+        { teamNumber: "", teamName: "", compatibility: "80", overall: "75" }
       ]
     },
     {
@@ -74,10 +83,10 @@ const PitScoutingSummary = () => {
       title: "Table 6",
       columns: ["Team Number", "Team Name", "Rank"],
       data: [
-        { teamNumber: "7983", teamName: "TechVenture", rank: "1" },
-        { teamNumber: "23045", teamName: "Aperture Science", rank: "2" },
-        { teamNumber: "8079", teamName: "Out the Hat", rank: "3" },
-        { teamNumber: "23346", teamName: "Out of the Box", rank: "4" }
+        { teamNumber: "", teamName: "", rank: "1" },
+        { teamNumber: "", teamName: "", rank: "2" },
+        { teamNumber: "", teamName: "", rank: "3" },
+        { teamNumber: "", teamName: "", rank: "4" }
       ]
     }
   ];
@@ -138,11 +147,11 @@ const PitScoutingSummary = () => {
                             <TableCell className="text-white">{row.teamNumber}</TableCell>
                             <TableCell className="text-white">{row.teamName}</TableCell>
                             <TableCell className="text-white">
-                              {(row as any)[Object.keys(row)[2]] || (row as any)[table.columns[2].toLowerCase().replace(' ', '')]}
+                              {(row as any)[Object.keys(row)[2]]}
                             </TableCell>
                             {table.columns.length > 3 && (
                               <TableCell className="text-white">
-                                {(row as any)[Object.keys(row)[3]] || (row as any)[table.columns[3].toLowerCase().replace(' ', '')]}
+                                {(row as any)[Object.keys(row)[3]]}
                               </TableCell>
                             )}
                           </TableRow>
