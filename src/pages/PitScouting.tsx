@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -27,13 +27,23 @@ const PitScouting = () => {
     { teamNumber: '', teamName: '' }
   ]);
 
+  useEffect(() => {
+    // Load saved teams
+    const savedTeams = localStorage.getItem('eventTeams');
+    if (savedTeams) {
+      setTeams(JSON.parse(savedTeams));
+    }
+  }, []);
+
   const addTeamRow = () => {
     setTeams([...teams, { teamNumber: '', teamName: '' }]);
   };
 
   const removeTeamRow = (index: number) => {
     if (teams.length > 1) {
-      setTeams(teams.filter((_, i) => i !== index));
+      const updatedTeams = teams.filter((_, i) => i !== index);
+      setTeams(updatedTeams);
+      localStorage.setItem('eventTeams', JSON.stringify(updatedTeams));
     }
   };
 
@@ -41,6 +51,8 @@ const PitScouting = () => {
     const updatedTeams = [...teams];
     updatedTeams[index][field] = value;
     setTeams(updatedTeams);
+    // Save continuously
+    localStorage.setItem('eventTeams', JSON.stringify(updatedTeams));
   };
 
   const handleGenerateTables = () => {
@@ -66,9 +78,9 @@ const PitScouting = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/')}
-                className="rotate-90"
+                className="text-gray-900"
               >
-                <ArrowUp className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Pit Scouting</h1>
@@ -83,7 +95,7 @@ const PitScouting = () => {
         <Card className="p-6">
           <h2 className="text-lg font-semibold mb-4">Event Teams</h2>
           <p className="text-sm text-gray-600 mb-6">
-            Enter all the teams participating in your event. These will be used throughout the app.
+            Enter all the teams participating in your event. These will be used throughout the app. Data is saved automatically.
           </p>
 
           <div className="bg-white rounded-lg border">

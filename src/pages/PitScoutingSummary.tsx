@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -62,17 +61,31 @@ const PitScoutingSummary = () => {
       });
       setTeamScores(initialScores);
     }
+
+    // Load saved scores
+    const savedScores = localStorage.getItem('pitScoutingScores');
+    if (savedScores) {
+      setTeamScores(JSON.parse(savedScores));
+    }
+
+    // Load saved rankings
+    const savedRankings = localStorage.getItem('pitScoutingRankings');
+    if (savedRankings) {
+      setFinalRankings(JSON.parse(savedRankings));
+    }
   }, []);
 
   const updateTeamScore = (teamNumber: string, field: keyof TeamScore, value: string) => {
-    const numericValue = parseFloat(value) || 0;
-    setTeamScores(prev => ({
-      ...prev,
+    const numericValue = Math.max(0, Math.min(5, parseFloat(value) || 0)); // Limit to 0-5
+    const updatedScores = {
+      ...teamScores,
       [teamNumber]: {
-        ...prev[teamNumber],
+        ...teamScores[teamNumber],
         [field]: numericValue
       }
-    }));
+    };
+    setTeamScores(updatedScores);
+    localStorage.setItem('pitScoutingScores', JSON.stringify(updatedScores));
   };
 
   const generateFinalRankings = () => {
@@ -85,32 +98,32 @@ const PitScoutingSummary = () => {
     });
     
     setFinalRankings(rankedTeams);
+    localStorage.setItem('pitScoutingRankings', JSON.stringify(rankedTeams));
   };
 
-  // Create tables using actual team data
   const tables = [
     {
       id: 1,
       title: "Auto Performance Ranking",
-      columns: ["Team Number", "Team Name", "Auto Score"],
+      columns: ["Team Number", "Team Name", "Auto Score (0-5)"],
       dataKey: "auto"
     },
     {
       id: 2,
       title: "TeleOp Performance Ranking", 
-      columns: ["Team Number", "Team Name", "TeleOp Score"],
+      columns: ["Team Number", "Team Name", "TeleOp Score (0-5)"],
       dataKey: "teleop"
     },
     {
       id: 3,
       title: "Endgame Performance Ranking",
-      columns: ["Team Number", "Team Name", "Endgame Score"],
+      columns: ["Team Number", "Team Name", "Endgame Score (0-5)"],
       dataKey: "endgame"
     },
     {
       id: 4,
       title: "Overall Team Rankings",
-      columns: ["Team Number", "Team Name", "Compatibility Score", "Overall Score"],
+      columns: ["Team Number", "Team Name", "Compatibility Score (0-5)", "Overall Score (0-5)"],
       dataKey: "overall"
     },
     {
@@ -127,16 +140,16 @@ const PitScoutingSummary = () => {
         <>
           {finalRankings.length > 0 ? (
             finalRankings.map((team, index) => (
-              <TableRow key={index} className="border-slate-700">
-                <TableCell className="text-white font-bold">#{index + 1}</TableCell>
-                <TableCell className="text-white">{team.teamNumber}</TableCell>
-                <TableCell className="text-white">{team.teamName}</TableCell>
-                <TableCell className="text-white">{team.overallScore.toFixed(1)}</TableCell>
+              <TableRow key={index} className="border-gray-200">
+                <TableCell className="text-gray-900 font-bold">#{index + 1}</TableCell>
+                <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
+                <TableCell className="text-gray-900">{team.teamName}</TableCell>
+                <TableCell className="text-gray-900">{team.overallScore.toFixed(1)}</TableCell>
               </TableRow>
             ))
           ) : (
-            <TableRow className="border-slate-700">
-              <TableCell colSpan={4} className="text-center text-slate-400 py-8">
+            <TableRow className="border-gray-200">
+              <TableCell colSpan={4} className="text-center text-gray-500 py-8">
                 Click "Generate Final Rankings" to see ranked teams
               </TableCell>
             </TableRow>
@@ -148,14 +161,17 @@ const PitScoutingSummary = () => {
     return (
       <>
         {teams.slice(0, 8).map((team, index) => (
-          <TableRow key={index} className="border-slate-700">
-            <TableCell className="text-white">{team.teamNumber}</TableCell>
-            <TableCell className="text-white">{team.teamName}</TableCell>
-            <TableCell className="text-white">
+          <TableRow key={index} className="border-gray-200">
+            <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
+            <TableCell className="text-gray-900">{team.teamName}</TableCell>
+            <TableCell className="text-gray-900">
               <input 
-                className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
-                placeholder="-"
+                className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-16 focus:outline-none focus:border-blue-500"
+                placeholder="0-5"
                 type="number"
+                min="0"
+                max="5"
+                step="0.1"
                 value={
                   table.dataKey === "auto" ? teamScores[team.teamNumber]?.autoScore || "" :
                   table.dataKey === "teleop" ? teamScores[team.teamNumber]?.teleopScore || "" :
@@ -172,11 +188,14 @@ const PitScoutingSummary = () => {
               />
             </TableCell>
             {table.columns.length > 3 && (
-              <TableCell className="text-white">
+              <TableCell className="text-gray-900">
                 <input 
-                  className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
-                  placeholder="-"
+                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-16 focus:outline-none focus:border-blue-500"
+                  placeholder="0-5"
                   type="number"
+                  min="0"
+                  max="5"
+                  step="0.1"
                   value={teamScores[team.teamNumber]?.overallScore || ""}
                   onChange={(e) => updateTeamScore(team.teamNumber, "overallScore", e.target.value)}
                 />
@@ -185,8 +204,8 @@ const PitScoutingSummary = () => {
           </TableRow>
         ))}
         {teams.length === 0 && (
-          <TableRow className="border-slate-700">
-            <TableCell colSpan={table.columns.length} className="text-center text-slate-400 py-8">
+          <TableRow className="border-gray-200">
+            <TableCell colSpan={table.columns.length} className="text-center text-gray-500 py-8">
               No teams entered yet. Go back to Pit Scouting to add teams.
             </TableCell>
           </TableRow>
@@ -196,9 +215,9 @@ const PitScoutingSummary = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50">
       {/* Header */}
-      <div className="bg-slate-800 border-b border-slate-700">
+      <div className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -206,23 +225,23 @@ const PitScoutingSummary = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/pit-scouting')}
-                className="text-white"
+                className="text-gray-900"
               >
-                <ArrowUp className="w-5 h-5 rotate-90" />
+                <ArrowLeft className="w-5 h-5" />
               </Button>
               <div>
-                <h1 className="text-xl font-bold">Summary Tables</h1>
-                <p className="text-sm text-slate-400">Swipe to navigate between ranking tables</p>
+                <h1 className="text-xl font-bold text-gray-900">Summary Tables</h1>
+                <p className="text-sm text-gray-500">Swipe to navigate between ranking tables</p>
               </div>
             </div>
-            <Users className="w-6 h-6 text-blue-400" />
+            <Users className="w-6 h-6 text-blue-600" />
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto p-4">
-        <p className="text-center text-slate-400 mb-6 text-sm">
-          Use these tables to rank and analyze all teams at your competition.
+        <p className="text-center text-gray-600 mb-6 text-sm">
+          Use these tables to rank and analyze all teams at your competition. (Scale: 0-5)
         </p>
 
         <Carousel className="w-full">
@@ -230,16 +249,16 @@ const PitScoutingSummary = () => {
             {tables.map((table) => (
               <CarouselItem key={table.id}>
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-bold text-center text-white mb-6">
+                  <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
                     {table.title}
                   </h2>
 
-                  <div className="bg-slate-800 rounded-lg p-4">
+                  <div className="bg-white rounded-lg border border-gray-200 p-4">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-slate-700">
+                        <TableRow className="border-gray-200">
                           {table.columns.map((column, index) => (
-                            <TableHead key={index} className="text-slate-300">
+                            <TableHead key={index} className="text-gray-700">
                               {column}
                             </TableHead>
                           ))}
@@ -254,18 +273,18 @@ const PitScoutingSummary = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="text-white border-slate-600 hover:bg-slate-700" />
-          <CarouselNext className="text-white border-slate-600 hover:bg-slate-700" />
+          <CarouselPrevious className="text-gray-900 border-gray-300 hover:bg-gray-100" />
+          <CarouselNext className="text-gray-900 border-gray-300 hover:bg-gray-100" />
         </Carousel>
 
         <div className="flex justify-between items-center mt-8">
           <div className="flex space-x-2">
             {Array.from({ length: 5 }, (_, i) => (
-              <div key={i} className="w-2 h-2 bg-slate-600 rounded-full" />
+              <div key={i} className="w-2 h-2 bg-gray-400 rounded-full" />
             ))}
           </div>
           <Button
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
             onClick={generateFinalRankings}
           >
             Generate Final Rankings
@@ -273,7 +292,7 @@ const PitScoutingSummary = () => {
         </div>
 
         <div className="flex justify-center mt-6">
-          <Users className="w-6 h-6 text-slate-500" />
+          <Users className="w-6 h-6 text-gray-400" />
         </div>
       </div>
     </div>

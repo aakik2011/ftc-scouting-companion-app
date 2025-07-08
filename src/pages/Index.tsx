@@ -3,10 +3,20 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Trophy } from 'lucide-react';
+import { Users, Trophy, Trash2 } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const handleDeleteAllData = () => {
+    if (window.confirm('Are you sure you want to delete all saved data? This cannot be undone.')) {
+      localStorage.removeItem('eventTeams');
+      localStorage.removeItem('pitScoutingScores');
+      localStorage.removeItem('pitScoutingRankings');
+      localStorage.removeItem('matchScoutingData');
+      alert('All data has been deleted successfully.');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 p-4">
@@ -50,8 +60,20 @@ const Index = () => {
           </Card>
         </div>
 
+        {/* Delete All Data Button */}
+        <div className="mt-16 text-center">
+          <Button
+            onClick={handleDeleteAllData}
+            variant="destructive"
+            className="bg-red-600 hover:bg-red-700 text-white flex items-center space-x-2"
+          >
+            <Trash2 className="w-4 h-4" />
+            <span>Delete All Data</span>
+          </Button>
+        </div>
+
         {/* Footer */}
-        <div className="text-center mt-12 text-gray-400 text-sm">
+        <div className="text-center mt-8 text-gray-400 text-sm">
           <p>Built for FTC Teams</p>
         </div>
       </div>
