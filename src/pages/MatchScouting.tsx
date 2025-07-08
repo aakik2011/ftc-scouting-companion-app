@@ -185,7 +185,7 @@ const MatchScouting = () => {
       
       <Card className="p-4">
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-2">Total Number of Matches</label>
               <Input
@@ -222,7 +222,7 @@ const MatchScouting = () => {
                   <h4 className="font-medium">Match {match.matchNumber}</h4>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <h5 className="text-sm font-medium text-red-600 mb-2">Red Alliance</h5>
                     <div className="space-y-2">
@@ -310,7 +310,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -321,7 +320,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -332,7 +330,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -349,7 +346,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -360,7 +356,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -371,7 +366,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -406,7 +400,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -417,7 +410,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -428,7 +420,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -445,7 +436,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -456,7 +446,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
@@ -467,7 +456,6 @@ const MatchScouting = () => {
                         type="number"
                         min="0"
                         max="5"
-                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
