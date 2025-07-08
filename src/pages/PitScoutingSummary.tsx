@@ -76,12 +76,11 @@ const PitScoutingSummary = () => {
   }, []);
 
   const updateTeamScore = (teamNumber: string, field: keyof TeamScore, value: string) => {
-    const numericValue = Math.max(0, Math.min(5, parseFloat(value) || 0)); // Limit to 0-5
     const updatedScores = {
       ...teamScores,
       [teamNumber]: {
         ...teamScores[teamNumber],
-        [field]: numericValue
+        [field]: value
       }
     };
     setTeamScores(updatedScores);
@@ -104,32 +103,32 @@ const PitScoutingSummary = () => {
   const tables = [
     {
       id: 1,
-      title: "Auto Performance Ranking",
-      columns: ["Team Number", "Team Name", "Auto Score (0-5)"],
+      title: "Auto Performance Notes",
+      columns: ["Team Number", "Team Name", "Auto Performance Notes"],
       dataKey: "auto"
     },
     {
       id: 2,
-      title: "TeleOp Performance Ranking", 
-      columns: ["Team Number", "Team Name", "TeleOp Score (0-5)"],
+      title: "TeleOp Performance Notes", 
+      columns: ["Team Number", "Team Name", "TeleOp Performance Notes"],
       dataKey: "teleop"
     },
     {
       id: 3,
-      title: "Endgame Performance Ranking",
-      columns: ["Team Number", "Team Name", "Endgame Score (0-5)"],
+      title: "Endgame Performance Notes",
+      columns: ["Team Number", "Team Name", "Endgame Performance Notes"],
       dataKey: "endgame"
     },
     {
       id: 4,
-      title: "Overall Team Rankings",
-      columns: ["Team Number", "Team Name", "Compatibility Score (0-5)", "Overall Score (0-5)"],
+      title: "Overall Team Assessment",
+      columns: ["Team Number", "Team Name", "Compatibility Notes", "Overall Assessment"],
       dataKey: "overall"
     },
     {
       id: 5,
       title: "Final Team Rankings",
-      columns: ["Rank", "Team Number", "Team Name", "Total Score"],
+      columns: ["Rank", "Team Number", "Team Name", "Overall Assessment"],
       dataKey: "rank"
     }
   ];
@@ -144,7 +143,7 @@ const PitScoutingSummary = () => {
                 <TableCell className="text-gray-900 font-bold">#{index + 1}</TableCell>
                 <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
                 <TableCell className="text-gray-900">{team.teamName}</TableCell>
-                <TableCell className="text-gray-900">{team.overallScore.toFixed(1)}</TableCell>
+                <TableCell className="text-gray-900">{team.overallScore}</TableCell>
               </TableRow>
             ))
           ) : (
@@ -165,13 +164,9 @@ const PitScoutingSummary = () => {
             <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
             <TableCell className="text-gray-900">{team.teamName}</TableCell>
             <TableCell className="text-gray-900">
-              <input 
-                className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-16 focus:outline-none focus:border-blue-500"
-                placeholder="0-5"
-                type="number"
-                min="0"
-                max="5"
-                step="0.1"
+              <textarea 
+                className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-full min-h-[60px] resize-none focus:outline-none focus:border-blue-500"
+                placeholder="Enter notes about this team..."
                 value={
                   table.dataKey === "auto" ? teamScores[team.teamNumber]?.autoScore || "" :
                   table.dataKey === "teleop" ? teamScores[team.teamNumber]?.teleopScore || "" :
@@ -189,13 +184,9 @@ const PitScoutingSummary = () => {
             </TableCell>
             {table.columns.length > 3 && (
               <TableCell className="text-gray-900">
-                <input 
-                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-16 focus:outline-none focus:border-blue-500"
-                  placeholder="0-5"
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.1"
+                <textarea 
+                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-full min-h-[60px] resize-none focus:outline-none focus:border-blue-500"
+                  placeholder="Enter overall assessment..."
                   value={teamScores[team.teamNumber]?.overallScore || ""}
                   onChange={(e) => updateTeamScore(team.teamNumber, "overallScore", e.target.value)}
                 />
@@ -241,7 +232,7 @@ const PitScoutingSummary = () => {
 
       <div className="max-w-4xl mx-auto p-4">
         <p className="text-center text-gray-600 mb-6 text-sm">
-          Use these tables to rank and analyze all teams at your competition. (Scale: 0-5)
+          Use these tables to assess and analyze all teams at your competition with detailed notes.
         </p>
 
         <Carousel className="w-full">
