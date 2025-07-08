@@ -10,11 +10,17 @@ const Index = () => {
 
   const handleDeleteAllData = () => {
     if (window.confirm('Are you sure you want to delete all saved data? This cannot be undone.')) {
+      // Clear all pit scouting data
       localStorage.removeItem('eventTeams');
       localStorage.removeItem('pitScoutingScores');
       localStorage.removeItem('pitScoutingRankings');
+      
+      // Clear all match scouting data
+      localStorage.removeItem('matchScoutingSetup');
       localStorage.removeItem('matchScoutingData');
-      alert('All data has been deleted successfully.');
+      
+      // Force a page refresh to reset the app state
+      window.location.reload();
     }
   };
 

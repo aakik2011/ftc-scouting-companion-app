@@ -132,7 +132,8 @@ const MatchScouting = () => {
       (updatedMatches[index] as any)[field] = value;
     } else {
       // Limit numeric values to 0-5
-      (updatedMatches[index] as any)[field] = Math.max(0, Math.min(5, value));
+      const numericValue = Math.max(0, Math.min(5, Number(value) || 0));
+      (updatedMatches[index] as any)[field] = numericValue;
     }
     
     setMatches(updatedMatches);
@@ -304,31 +305,34 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.redTeam1Auto}
-                        onChange={(e) => updateMatch(index, 'redTeam1Auto', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam1Auto', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam1Teleop}
-                        onChange={(e) => updateMatch(index, 'redTeam1Teleop', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam1Teleop', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam1Hang}
-                        onChange={(e) => updateMatch(index, 'redTeam1Hang', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam1Hang', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -340,31 +344,34 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.redTeam2Auto}
-                        onChange={(e) => updateMatch(index, 'redTeam2Auto', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam2Auto', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam2Teleop}
-                        onChange={(e) => updateMatch(index, 'redTeam2Teleop', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam2Teleop', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam2Hang}
-                        onChange={(e) => updateMatch(index, 'redTeam2Hang', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'redTeam2Hang', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -394,31 +401,34 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.blueTeam1Auto}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Auto', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Auto', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam1Teleop}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Teleop', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Teleop', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam1Hang}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Hang', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Hang', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -430,31 +440,34 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.blueTeam2Auto}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Auto', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Auto', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam2Teleop}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Teleop', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Teleop', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam2Hang}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Hang', parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Hang', e.target.value)}
                         className="w-16"
                         type="number"
                         min="0"
                         max="5"
+                        onFocus={(e) => e.target.select()}
                       />
                     </TableCell>
                     <TableCell className="font-medium">

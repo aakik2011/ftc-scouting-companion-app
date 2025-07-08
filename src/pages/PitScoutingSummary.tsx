@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ArrowLeft, Users } from 'lucide-react';
 import {
   Carousel,
@@ -26,9 +28,9 @@ interface Team {
 interface TeamScore {
   teamNumber: string;
   teamName: string;
-  autoScore: number;
-  teleopScore: number;
-  endgameScore: number;
+  autoScore: string;
+  teleopScore: string;
+  endgameScore: string;
   compatibilityScore: number;
   overallScore: number;
 }
@@ -52,9 +54,9 @@ const PitScoutingSummary = () => {
         initialScores[team.teamNumber] = {
           teamNumber: team.teamNumber,
           teamName: team.teamName,
-          autoScore: 0,
-          teleopScore: 0,
-          endgameScore: 0,
+          autoScore: '',
+          teleopScore: '',
+          endgameScore: '',
           compatibilityScore: 0,
           overallScore: 0,
         };
@@ -75,7 +77,7 @@ const PitScoutingSummary = () => {
     }
   }, []);
 
-  const updateTeamScore = (teamNumber: string, field: keyof TeamScore, value: string) => {
+  const updateTeamScore = (teamNumber: string, field: keyof TeamScore, value: string | number) => {
     const updatedScores = {
       ...teamScores,
       [teamNumber]: {
@@ -88,13 +90,12 @@ const PitScoutingSummary = () => {
   };
 
   const generateFinalRankings = () => {
-    const rankedTeams = Object.values(teamScores).sort((a, b) => {
-      // Sort by overall score (descending), then by compatibility score (descending)
-      if (b.overallScore !== a.overallScore) {
-        return b.overallScore - a.overallScore;
-      }
-      return b.compatibilityScore - a.compatibilityScore;
-    });
+    const rankedTeams = Object.values(teamScores)
+      .map(team => ({
+        ...team,
+        averageScore: (team.compatibilityScore + team.overallScore) / 2
+      }))
+      .sort((a, b) => b.averageScore - a.averageScore);
     
     setFinalRankings(rankedTeams);
     localStorage.setItem('pitScoutingRankings', JSON.stringify(rankedTeams));
@@ -121,14 +122,14 @@ const PitScoutingSummary = () => {
     },
     {
       id: 4,
-      title: "Overall Team Assessment",
-      columns: ["Team Number", "Team Name", "Compatibility Notes", "Overall Assessment"],
+      title: "Team Compatibility & Overall Assessment",
+      columns: ["Team Number", "Team Name", "Compatibility Score (0-10)", "Overall Score (0-10)"],
       dataKey: "overall"
     },
     {
       id: 5,
       title: "Final Team Rankings",
-      columns: ["Rank", "Team Number", "Team Name", "Overall Assessment"],
+      columns: ["Rank", "Team Number", "Team Name", "Average Score"],
       dataKey: "rank"
     }
   ];
@@ -143,13 +144,59 @@ const PitScoutingSummary = () => {
                 <TableCell className="text-gray-900 font-bold">#{index + 1}</TableCell>
                 <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
                 <TableCell className="text-gray-900">{team.teamName}</TableCell>
-                <TableCell className="text-gray-900">{team.overallScore}</TableCell>
+                <TableCell className="text-gray-900 font-medium">
+                  {((team.compatibilityScore + team.overallScore) / 2).toFixed(1)}
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow className="border-gray-200">
               <TableCell colSpan={4} className="text-center text-gray-500 py-8">
                 Click "Generate Final Rankings" to see ranked teams
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      );
+    }
+
+    if (table.dataKey === "overall") {
+      return (
+        <>
+          {teams.slice(0, 8).map((team, index) => (
+            <TableRow key={index} className="border-gray-200">
+              <TableCell className="text-gray-900">{team.teamNumber}</TableCell>
+              <TableCell className="text-gray-900">{team.teamName}</TableCell>
+              <TableCell className="text-gray-900">
+                <Input
+                  type="number"
+                  min="0"
+                  max="10"
+                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-full focus:outline-none focus:border-blue-500"
+                  placeholder="0-10"
+                  value={teamScores[team.teamNumber]?.compatibilityScore || ''}
+                  onChange={(e) => updateTeamScore(team.teamNumber, "compatibilityScore", Number(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
+                />
+              </TableCell>
+              <TableCell className="text-gray-900">
+                <Input
+                  type="number"
+                  min="0"
+                  max="10"
+                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-full focus:outline-none focus:border-blue-500"
+                  placeholder="0-10"
+                  value={teamScores[team.teamNumber]?.overallScore || ''}
+                  onChange={(e) => updateTeamScore(team.teamNumber, "overallScore", Number(e.target.value) || 0)}
+                  onFocus={(e) => e.target.select()}
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+          {teams.length === 0 && (
+            <TableRow className="border-gray-200">
+              <TableCell colSpan={4} className="text-center text-gray-500 py-8">
+                No teams entered yet. Go back to Pit Scouting to add teams.
               </TableCell>
             </TableRow>
           )}
@@ -170,33 +217,21 @@ const PitScoutingSummary = () => {
                 value={
                   table.dataKey === "auto" ? teamScores[team.teamNumber]?.autoScore || "" :
                   table.dataKey === "teleop" ? teamScores[team.teamNumber]?.teleopScore || "" :
-                  table.dataKey === "endgame" ? teamScores[team.teamNumber]?.endgameScore || "" :
-                  teamScores[team.teamNumber]?.compatibilityScore || ""
+                  teamScores[team.teamNumber]?.endgameScore || ""
                 }
                 onChange={(e) => {
                   const field = table.dataKey === "auto" ? "autoScore" :
                                table.dataKey === "teleop" ? "teleopScore" :
-                               table.dataKey === "endgame" ? "endgameScore" :
-                               "compatibilityScore";
+                               "endgameScore";
                   updateTeamScore(team.teamNumber, field, e.target.value);
                 }}
               />
             </TableCell>
-            {table.columns.length > 3 && (
-              <TableCell className="text-gray-900">
-                <textarea 
-                  className="bg-white border border-gray-300 rounded px-2 py-1 text-gray-900 w-full min-h-[60px] resize-none focus:outline-none focus:border-blue-500"
-                  placeholder="Enter overall assessment..."
-                  value={teamScores[team.teamNumber]?.overallScore || ""}
-                  onChange={(e) => updateTeamScore(team.teamNumber, "overallScore", e.target.value)}
-                />
-              </TableCell>
-            )}
           </TableRow>
         ))}
         {teams.length === 0 && (
           <TableRow className="border-gray-200">
-            <TableCell colSpan={table.columns.length} className="text-center text-gray-500 py-8">
+            <TableCell colSpan={3} className="text-center text-gray-500 py-8">
               No teams entered yet. Go back to Pit Scouting to add teams.
             </TableCell>
           </TableRow>
