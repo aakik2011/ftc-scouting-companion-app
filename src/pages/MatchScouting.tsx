@@ -29,22 +29,22 @@ interface Team {
 
 interface MatchEntry {
   matchNumber: string;
-  team1: string;
-  team2: string;
-  team3: string;
-  team4: string;
-  team1Auto: string;
-  team1Teleop: string;
-  team1Hang: string;
-  team2Auto: string;
-  team2Teleop: string;
-  team2Hang: string;
-  team3Auto: string;
-  team3Teleop: string;
-  team3Hang: string;
-  team4Auto: string;
-  team4Teleop: string;
-  team4Hang: string;
+  redTeam1: string;
+  redTeam2: string;
+  blueTeam1: string;
+  blueTeam2: string;
+  redTeam1Auto: string;
+  redTeam1Teleop: string;
+  redTeam1Hang: string;
+  redTeam2Auto: string;
+  redTeam2Teleop: string;
+  redTeam2Hang: string;
+  blueTeam1Auto: string;
+  blueTeam1Teleop: string;
+  blueTeam1Hang: string;
+  blueTeam2Auto: string;
+  blueTeam2Teleop: string;
+  blueTeam2Hang: string;
 }
 
 const MatchScouting = () => {
@@ -53,11 +53,11 @@ const MatchScouting = () => {
   const [matches, setMatches] = useState<MatchEntry[]>([
     {
       matchNumber: '1',
-      team1: '', team2: '', team3: '', team4: '',
-      team1Auto: '', team1Teleop: '', team1Hang: '',
-      team2Auto: '', team2Teleop: '', team2Hang: '',
-      team3Auto: '', team3Teleop: '', team3Hang: '',
-      team4Auto: '', team4Teleop: '', team4Hang: ''
+      redTeam1: '', redTeam2: '', blueTeam1: '', blueTeam2: '',
+      redTeam1Auto: '', redTeam1Teleop: '', redTeam1Hang: '',
+      redTeam2Auto: '', redTeam2Teleop: '', redTeam2Hang: '',
+      blueTeam1Auto: '', blueTeam1Teleop: '', blueTeam1Hang: '',
+      blueTeam2Auto: '', blueTeam2Teleop: '', blueTeam2Hang: ''
     }
   ]);
 
@@ -72,11 +72,11 @@ const MatchScouting = () => {
     const newMatchNumber = (matches.length + 1).toString();
     setMatches([...matches, {
       matchNumber: newMatchNumber,
-      team1: '', team2: '', team3: '', team4: '',
-      team1Auto: '', team1Teleop: '', team1Hang: '',
-      team2Auto: '', team2Teleop: '', team2Hang: '',
-      team3Auto: '', team3Teleop: '', team3Hang: '',
-      team4Auto: '', team4Teleop: '', team4Hang: ''
+      redTeam1: '', redTeam2: '', blueTeam1: '', blueTeam2: '',
+      redTeam1Auto: '', redTeam1Teleop: '', redTeam1Hang: '',
+      redTeam2Auto: '', redTeam2Teleop: '', redTeam2Hang: '',
+      blueTeam1Auto: '', blueTeam1Teleop: '', blueTeam1Hang: '',
+      blueTeam2Auto: '', blueTeam2Teleop: '', blueTeam2Hang: ''
     }]);
   };
 
@@ -102,16 +102,22 @@ const MatchScouting = () => {
   const generateGraphData = () => {
     const data: any[] = [];
     matches.forEach((match, matchIndex) => {
-      ['team1', 'team2', 'team3', 'team4'].forEach((teamKey) => {
-        const teamNumber = match[teamKey as keyof MatchEntry] as string;
-        if (teamNumber) {
-          const auto = parseFloat(match[`${teamKey}Auto` as keyof MatchEntry] as string) || 0;
-          const teleop = parseFloat(match[`${teamKey}Teleop` as keyof MatchEntry] as string) || 0;
-          const hang = parseFloat(match[`${teamKey}Hang` as keyof MatchEntry] as string) || 0;
-          const matchAverage = (auto + teleop + hang) / 3;
+      const teams = [
+        { key: 'redTeam1', team: match.redTeam1, auto: match.redTeam1Auto, teleop: match.redTeam1Teleop, hang: match.redTeam1Hang },
+        { key: 'redTeam2', team: match.redTeam2, auto: match.redTeam2Auto, teleop: match.redTeam2Teleop, hang: match.redTeam2Hang },
+        { key: 'blueTeam1', team: match.blueTeam1, auto: match.blueTeam1Auto, teleop: match.blueTeam1Teleop, hang: match.blueTeam1Hang },
+        { key: 'blueTeam2', team: match.blueTeam2, auto: match.blueTeam2Auto, teleop: match.blueTeam2Teleop, hang: match.blueTeam2Hang }
+      ];
+      
+      teams.forEach(({ team, auto, teleop, hang }) => {
+        if (team) {
+          const autoScore = parseFloat(auto) || 0;
+          const teleopScore = parseFloat(teleop) || 0;
+          const hangScore = parseFloat(hang) || 0;
+          const matchAverage = (autoScore + teleopScore + hangScore) / 3;
           
           data.push({
-            teamNumber,
+            teamNumber: team,
             matchAverage,
             totalAverage: matchAverage, // For now, same as match average
             matchNumber: match.matchNumber,
@@ -133,208 +139,240 @@ const MatchScouting = () => {
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Match #</TableHead>
-              <TableHead>Team #1</TableHead>
-              <TableHead>Auto</TableHead>
-              <TableHead>Tele-op</TableHead>
-              <TableHead>Hang</TableHead>
-              <TableHead>Avg</TableHead>
-              <TableHead>Team #2</TableHead>
-              <TableHead>Auto</TableHead>
-              <TableHead>Tele-op</TableHead>
-              <TableHead>Hang</TableHead>
-              <TableHead>Avg</TableHead>
-              <TableHead>Team #3</TableHead>
-              <TableHead>Auto</TableHead>
-              <TableHead>Tele-op</TableHead>
-              <TableHead>Hang</TableHead>
-              <TableHead>Avg</TableHead>
-              <TableHead>Team #4</TableHead>
-              <TableHead>Auto</TableHead>
-              <TableHead>Tele-op</TableHead>
-              <TableHead>Hang</TableHead>
-              <TableHead>Avg</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {matches.map((match, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Input
-                    value={match.matchNumber}
-                    onChange={(e) => updateMatch(index, 'matchNumber', e.target.value)}
-                    className="w-16"
-                  />
-                </TableCell>
-                
-                {/* Team 1 */}
-                <TableCell>
-                  <Input
-                    value={match.team1}
-                    onChange={(e) => updateMatch(index, 'team1', e.target.value)}
-                    className="w-20"
-                    placeholder="Team #"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team1Auto}
-                    onChange={(e) => updateMatch(index, 'team1Auto', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team1Teleop}
-                    onChange={(e) => updateMatch(index, 'team1Teleop', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team1Hang}
-                    onChange={(e) => updateMatch(index, 'team1Hang', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {calculateAverage(match.team1Auto, match.team1Teleop, match.team1Hang)}
-                </TableCell>
+      <div className="space-y-6">
+        {matches.map((match, index) => (
+          <div key={index} className="bg-white border rounded-lg p-4">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center space-x-2">
+                <label className="font-medium">Match #:</label>
+                <Input
+                  value={match.matchNumber}
+                  onChange={(e) => updateMatch(index, 'matchNumber', e.target.value)}
+                  className="w-20"
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => removeMatch(index)}
+                disabled={matches.length === 1}
+                className="text-red-600 hover:text-red-700"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
 
-                {/* Team 2 */}
-                <TableCell>
-                  <Input
-                    value={match.team2}
-                    onChange={(e) => updateMatch(index, 'team2', e.target.value)}
-                    className="w-20"
-                    placeholder="Team #"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team2Auto}
-                    onChange={(e) => updateMatch(index, 'team2Auto', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team2Teleop}
-                    onChange={(e) => updateMatch(index, 'team2Teleop', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team2Hang}
-                    onChange={(e) => updateMatch(index, 'team2Hang', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {calculateAverage(match.team2Auto, match.team2Teleop, match.team2Hang)}
-                </TableCell>
+            {/* Red Alliance */}
+            <div className="mb-4">
+              <h3 className="text-lg font-medium text-red-600 mb-2">Red Alliance</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Team #</TableHead>
+                    <TableHead>Auto</TableHead>
+                    <TableHead>Tele-op</TableHead>
+                    <TableHead>Hang</TableHead>
+                    <TableHead>Match Avg</TableHead>
+                    <TableHead>Total Avg</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam1}
+                        onChange={(e) => updateMatch(index, 'redTeam1', e.target.value)}
+                        className="w-20"
+                        placeholder="Team #"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam1Auto}
+                        onChange={(e) => updateMatch(index, 'redTeam1Auto', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam1Teleop}
+                        onChange={(e) => updateMatch(index, 'redTeam1Teleop', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam1Hang}
+                        onChange={(e) => updateMatch(index, 'redTeam1Hang', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.redTeam1Auto, match.redTeam1Teleop, match.redTeam1Hang)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.redTeam1Auto, match.redTeam1Teleop, match.redTeam1Hang)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam2}
+                        onChange={(e) => updateMatch(index, 'redTeam2', e.target.value)}
+                        className="w-20"
+                        placeholder="Team #"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam2Auto}
+                        onChange={(e) => updateMatch(index, 'redTeam2Auto', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam2Teleop}
+                        onChange={(e) => updateMatch(index, 'redTeam2Teleop', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.redTeam2Hang}
+                        onChange={(e) => updateMatch(index, 'redTeam2Hang', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.redTeam2Auto, match.redTeam2Teleop, match.redTeam2Hang)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.redTeam2Auto, match.redTeam2Teleop, match.redTeam2Hang)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
 
-                {/* Team 3 */}
-                <TableCell>
-                  <Input
-                    value={match.team3}
-                    onChange={(e) => updateMatch(index, 'team3', e.target.value)}
-                    className="w-20"
-                    placeholder="Team #"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team3Auto}
-                    onChange={(e) => updateMatch(index, 'team3Auto', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team3Teleop}
-                    onChange={(e) => updateMatch(index, 'team3Teleop', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team3Hang}
-                    onChange={(e) => updateMatch(index, 'team3Hang', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {calculateAverage(match.team3Auto, match.team3Teleop, match.team3Hang)}
-                </TableCell>
-
-                {/* Team 4 */}
-                <TableCell>
-                  <Input
-                    value={match.team4}
-                    onChange={(e) => updateMatch(index, 'team4', e.target.value)}
-                    className="w-20"
-                    placeholder="Team #"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team4Auto}
-                    onChange={(e) => updateMatch(index, 'team4Auto', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team4Teleop}
-                    onChange={(e) => updateMatch(index, 'team4Teleop', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    value={match.team4Hang}
-                    onChange={(e) => updateMatch(index, 'team4Hang', e.target.value)}
-                    className="w-16"
-                    placeholder="0"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {calculateAverage(match.team4Auto, match.team4Teleop, match.team4Hang)}
-                </TableCell>
-
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeMatch(index)}
-                    disabled={matches.length === 1}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            {/* Blue Alliance */}
+            <div>
+              <h3 className="text-lg font-medium text-blue-600 mb-2">Blue Alliance</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Team #</TableHead>
+                    <TableHead>Auto</TableHead>
+                    <TableHead>Tele-op</TableHead>
+                    <TableHead>Hang</TableHead>
+                    <TableHead>Match Avg</TableHead>
+                    <TableHead>Total Avg</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam1}
+                        onChange={(e) => updateMatch(index, 'blueTeam1', e.target.value)}
+                        className="w-20"
+                        placeholder="Team #"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam1Auto}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Auto', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam1Teleop}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Teleop', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam1Hang}
+                        onChange={(e) => updateMatch(index, 'blueTeam1Hang', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.blueTeam1Auto, match.blueTeam1Teleop, match.blueTeam1Hang)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.blueTeam1Auto, match.blueTeam1Teleop, match.blueTeam1Hang)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam2}
+                        onChange={(e) => updateMatch(index, 'blueTeam2', e.target.value)}
+                        className="w-20"
+                        placeholder="Team #"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam2Auto}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Auto', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam2Teleop}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Teleop', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        value={match.blueTeam2Hang}
+                        onChange={(e) => updateMatch(index, 'blueTeam2Hang', e.target.value)}
+                        className="w-16"
+                        placeholder="0"
+                        type="number"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.blueTeam2Auto, match.blueTeam2Teleop, match.blueTeam2Hang)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {calculateAverage(match.blueTeam2Auto, match.blueTeam2Teleop, match.blueTeam2Hang)}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -352,14 +390,14 @@ const MatchScouting = () => {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 type="number" 
-                dataKey="matchNumber" 
-                name="Match Number"
-                domain={[1, 'dataMax']}
+                dataKey="matchAverage" 
+                name="Match Average"
+                domain={[0, 5]}
               />
               <YAxis 
                 type="number" 
-                dataKey="matchAverage" 
-                name="Match Average"
+                dataKey="totalAverage" 
+                name="Total Average"
                 domain={[0, 5]}
               />
               <Tooltip 
@@ -371,14 +409,15 @@ const MatchScouting = () => {
                       <div className="bg-white p-3 border rounded shadow">
                         <p className="font-medium">Team {data.teamNumber}</p>
                         <p>Match {data.matchNumber}</p>
-                        <p>Average: {data.matchAverage.toFixed(1)}</p>
+                        <p>Match Average: {data.matchAverage.toFixed(1)}</p>
+                        <p>Total Average: {data.totalAverage.toFixed(1)}</p>
                       </div>
                     );
                   }
                   return null;
                 }}
               />
-              <Scatter dataKey="matchAverage" fill="#3b82f6" />
+              <Scatter dataKey="totalAverage" fill="#3b82f6" />
             </ScatterChart>
           </ResponsiveContainer>
         </div>

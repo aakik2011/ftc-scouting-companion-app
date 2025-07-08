@@ -24,17 +24,68 @@ interface Team {
   teamName: string;
 }
 
+interface TeamScore {
+  teamNumber: string;
+  teamName: string;
+  autoScore: number;
+  teleopScore: number;
+  endgameScore: number;
+  compatibilityScore: number;
+  overallScore: number;
+}
+
 const PitScoutingSummary = () => {
   const navigate = useNavigate();
   const { entryId } = useParams();
   const [teams, setTeams] = useState<Team[]>([]);
+  const [teamScores, setTeamScores] = useState<{ [key: string]: TeamScore }>({});
+  const [finalRankings, setFinalRankings] = useState<TeamScore[]>([]);
 
   useEffect(() => {
     const savedTeams = localStorage.getItem('eventTeams');
     if (savedTeams) {
-      setTeams(JSON.parse(savedTeams));
+      const parsedTeams = JSON.parse(savedTeams);
+      setTeams(parsedTeams);
+      
+      // Initialize team scores
+      const initialScores: { [key: string]: TeamScore } = {};
+      parsedTeams.forEach((team: Team) => {
+        initialScores[team.teamNumber] = {
+          teamNumber: team.teamNumber,
+          teamName: team.teamName,
+          autoScore: 0,
+          teleopScore: 0,
+          endgameScore: 0,
+          compatibilityScore: 0,
+          overallScore: 0,
+        };
+      });
+      setTeamScores(initialScores);
     }
   }, []);
+
+  const updateTeamScore = (teamNumber: string, field: keyof TeamScore, value: string) => {
+    const numericValue = parseFloat(value) || 0;
+    setTeamScores(prev => ({
+      ...prev,
+      [teamNumber]: {
+        ...prev[teamNumber],
+        [field]: numericValue
+      }
+    }));
+  };
+
+  const generateFinalRankings = () => {
+    const rankedTeams = Object.values(teamScores).sort((a, b) => {
+      // Sort by overall score (descending), then by compatibility score (descending)
+      if (b.overallScore !== a.overallScore) {
+        return b.overallScore - a.overallScore;
+      }
+      return b.compatibilityScore - a.compatibilityScore;
+    });
+    
+    setFinalRankings(rankedTeams);
+  };
 
   // Create tables using actual team data
   const tables = [
@@ -65,10 +116,84 @@ const PitScoutingSummary = () => {
     {
       id: 5,
       title: "Final Team Rankings",
-      columns: ["Team Number", "Team Name", "Final Rank"],
+      columns: ["Rank", "Team Number", "Team Name", "Total Score"],
       dataKey: "rank"
     }
   ];
+
+  const renderTableContent = (table: any) => {
+    if (table.dataKey === "rank") {
+      return (
+        <>
+          {finalRankings.length > 0 ? (
+            finalRankings.map((team, index) => (
+              <TableRow key={index} className="border-slate-700">
+                <TableCell className="text-white font-bold">#{index + 1}</TableCell>
+                <TableCell className="text-white">{team.teamNumber}</TableCell>
+                <TableCell className="text-white">{team.teamName}</TableCell>
+                <TableCell className="text-white">{team.overallScore.toFixed(1)}</TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow className="border-slate-700">
+              <TableCell colSpan={4} className="text-center text-slate-400 py-8">
+                Click "Generate Final Rankings" to see ranked teams
+              </TableCell>
+            </TableRow>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <>
+        {teams.slice(0, 8).map((team, index) => (
+          <TableRow key={index} className="border-slate-700">
+            <TableCell className="text-white">{team.teamNumber}</TableCell>
+            <TableCell className="text-white">{team.teamName}</TableCell>
+            <TableCell className="text-white">
+              <input 
+                className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
+                placeholder="-"
+                type="number"
+                value={
+                  table.dataKey === "auto" ? teamScores[team.teamNumber]?.autoScore || "" :
+                  table.dataKey === "teleop" ? teamScores[team.teamNumber]?.teleopScore || "" :
+                  table.dataKey === "endgame" ? teamScores[team.teamNumber]?.endgameScore || "" :
+                  teamScores[team.teamNumber]?.compatibilityScore || ""
+                }
+                onChange={(e) => {
+                  const field = table.dataKey === "auto" ? "autoScore" :
+                               table.dataKey === "teleop" ? "teleopScore" :
+                               table.dataKey === "endgame" ? "endgameScore" :
+                               "compatibilityScore";
+                  updateTeamScore(team.teamNumber, field, e.target.value);
+                }}
+              />
+            </TableCell>
+            {table.columns.length > 3 && (
+              <TableCell className="text-white">
+                <input 
+                  className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
+                  placeholder="-"
+                  type="number"
+                  value={teamScores[team.teamNumber]?.overallScore || ""}
+                  onChange={(e) => updateTeamScore(team.teamNumber, "overallScore", e.target.value)}
+                />
+              </TableCell>
+            )}
+          </TableRow>
+        ))}
+        {teams.length === 0 && (
+          <TableRow className="border-slate-700">
+            <TableCell colSpan={table.columns.length} className="text-center text-slate-400 py-8">
+              No teams entered yet. Go back to Pit Scouting to add teams.
+            </TableCell>
+          </TableRow>
+        )}
+      </>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -121,34 +246,7 @@ const PitScoutingSummary = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {teams.slice(0, 8).map((team, index) => (
-                          <TableRow key={index} className="border-slate-700">
-                            <TableCell className="text-white">{team.teamNumber}</TableCell>
-                            <TableCell className="text-white">{team.teamName}</TableCell>
-                            <TableCell className="text-white">
-                              {/* Empty field for user to fill in */}
-                              <input 
-                                className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
-                                placeholder="-"
-                              />
-                            </TableCell>
-                            {table.columns.length > 3 && (
-                              <TableCell className="text-white">
-                                <input 
-                                  className="bg-transparent border-b border-slate-600 text-white w-16 focus:outline-none focus:border-blue-400"
-                                  placeholder="-"
-                                />
-                              </TableCell>
-                            )}
-                          </TableRow>
-                        ))}
-                        {teams.length === 0 && (
-                          <TableRow className="border-slate-700">
-                            <TableCell colSpan={table.columns.length} className="text-center text-slate-400 py-8">
-                              No teams entered yet. Go back to Pit Scouting to add teams.
-                            </TableCell>
-                          </TableRow>
-                        )}
+                        {renderTableContent(table)}
                       </TableBody>
                     </Table>
                   </div>
@@ -168,7 +266,7 @@ const PitScoutingSummary = () => {
           </div>
           <Button
             className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => console.log('Generate Final Rankings')}
+            onClick={generateFinalRankings}
           >
             Generate Final Rankings
           </Button>
