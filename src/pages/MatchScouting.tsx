@@ -125,14 +125,14 @@ const MatchScouting = () => {
     setMatchSchedule(schedule);
   };
 
-  const updateMatch = (index: number, field: keyof MatchData, value: string | number) => {
+  const updateMatch = (index: number, field: keyof MatchData, value: string) => {
     const updatedMatches = [...matches];
     
-    if (typeof value === 'string') {
-      (updatedMatches[index] as any)[field] = value;
+    if (field === 'matchNumber' || field === 'redTeam1' || field === 'redTeam2' || field === 'blueTeam1' || field === 'blueTeam2') {
+      updatedMatches[index][field] = value;
     } else {
-      // Limit numeric values to 0-5
-      const numericValue = Math.max(0, Math.min(5, Number(value) || 0));
+      // Handle numeric fields with proper validation
+      const numericValue = Math.max(0, Math.min(5, parseInt(value) || 0));
       (updatedMatches[index] as any)[field] = numericValue;
     }
     
@@ -142,6 +142,10 @@ const MatchScouting = () => {
 
   const calculateMatchAverage = (auto: number, teleop: number, hang: number) => {
     return ((auto + teleop + hang) / 3).toFixed(1);
+  };
+
+  const isOurTeam = (teamNumber: string) => {
+    return teamNumber === ourTeam;
   };
 
   const generateGraphData = () => {
@@ -197,7 +201,7 @@ const MatchScouting = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-2">Our Team Number</label>
+              <label className="block text-sm font-medium mb-2">Your Team Number</label>
               <Input
                 value={ourTeam}
                 onChange={(e) => setOurTeam(e.target.value)}
@@ -274,7 +278,7 @@ const MatchScouting = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold">Match Scouting Data</h2>
         <div className="text-sm text-gray-600">
-          Our Team: <span className="font-medium">{ourTeam}</span>
+          Your Team: <span className="font-medium">{ourTeam}</span>
         </div>
       </div>
       <p className="text-sm text-gray-600">All scores are on a scale of 0-5. Data is saved automatically.</p>
@@ -300,11 +304,11 @@ const MatchScouting = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
+                  <TableRow className={isOurTeam(match.redTeam1) ? "bg-yellow-100" : ""}>
                     <TableCell className="font-medium">{match.redTeam1}</TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam1Auto}
+                        value={match.redTeam1Auto.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam1Auto', e.target.value)}
                         className="w-16"
                         type="number"
@@ -314,7 +318,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam1Teleop}
+                        value={match.redTeam1Teleop.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam1Teleop', e.target.value)}
                         className="w-16"
                         type="number"
@@ -324,7 +328,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam1Hang}
+                        value={match.redTeam1Hang.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam1Hang', e.target.value)}
                         className="w-16"
                         type="number"
@@ -336,11 +340,11 @@ const MatchScouting = () => {
                       {calculateMatchAverage(match.redTeam1Auto, match.redTeam1Teleop, match.redTeam1Hang)}
                     </TableCell>
                   </TableRow>
-                  <TableRow>
+                  <TableRow className={isOurTeam(match.redTeam2) ? "bg-yellow-100" : ""}>
                     <TableCell className="font-medium">{match.redTeam2}</TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam2Auto}
+                        value={match.redTeam2Auto.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam2Auto', e.target.value)}
                         className="w-16"
                         type="number"
@@ -350,7 +354,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam2Teleop}
+                        value={match.redTeam2Teleop.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam2Teleop', e.target.value)}
                         className="w-16"
                         type="number"
@@ -360,7 +364,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.redTeam2Hang}
+                        value={match.redTeam2Hang.toString()}
                         onChange={(e) => updateMatch(index, 'redTeam2Hang', e.target.value)}
                         className="w-16"
                         type="number"
@@ -390,11 +394,11 @@ const MatchScouting = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
+                  <TableRow className={isOurTeam(match.blueTeam1) ? "bg-yellow-100" : ""}>
                     <TableCell className="font-medium">{match.blueTeam1}</TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam1Auto}
+                        value={match.blueTeam1Auto.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam1Auto', e.target.value)}
                         className="w-16"
                         type="number"
@@ -404,7 +408,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam1Teleop}
+                        value={match.blueTeam1Teleop.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam1Teleop', e.target.value)}
                         className="w-16"
                         type="number"
@@ -414,7 +418,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam1Hang}
+                        value={match.blueTeam1Hang.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam1Hang', e.target.value)}
                         className="w-16"
                         type="number"
@@ -426,11 +430,11 @@ const MatchScouting = () => {
                       {calculateMatchAverage(match.blueTeam1Auto, match.blueTeam1Teleop, match.blueTeam1Hang)}
                     </TableCell>
                   </TableRow>
-                  <TableRow>
+                  <TableRow className={isOurTeam(match.blueTeam2) ? "bg-yellow-100" : ""}>
                     <TableCell className="font-medium">{match.blueTeam2}</TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam2Auto}
+                        value={match.blueTeam2Auto.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam2Auto', e.target.value)}
                         className="w-16"
                         type="number"
@@ -440,7 +444,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam2Teleop}
+                        value={match.blueTeam2Teleop.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam2Teleop', e.target.value)}
                         className="w-16"
                         type="number"
@@ -450,7 +454,7 @@ const MatchScouting = () => {
                     </TableCell>
                     <TableCell>
                       <Input
-                        value={match.blueTeam2Hang}
+                        value={match.blueTeam2Hang.toString()}
                         onChange={(e) => updateMatch(index, 'blueTeam2Hang', e.target.value)}
                         className="w-16"
                         type="number"
