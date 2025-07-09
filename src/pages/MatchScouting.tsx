@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -54,6 +53,17 @@ const MatchScouting = () => {
   const [ourTeam, setOurTeam] = useState<string>('');
   const [matchSchedule, setMatchSchedule] = useState<MatchSchedule[]>([]);
   const [matches, setMatches] = useState<MatchData[]>([]);
+
+  // Debounced save function to prevent focus issues
+  const debouncedSave = useCallback(
+    (data: MatchData[]) => {
+      const timeoutId = setTimeout(() => {
+        localStorage.setItem('matchScoutingData', JSON.stringify(data));
+      }, 300);
+      return () => clearTimeout(timeoutId);
+    },
+    []
+  );
 
   useEffect(() => {
     // Load saved setup data
@@ -137,11 +147,13 @@ const MatchScouting = () => {
     }
     
     setMatches(updatedMatches);
-    localStorage.setItem('matchScoutingData', JSON.stringify(updatedMatches));
+    // Use debounced save to prevent focus issues
+    debouncedSave(updatedMatches);
   };
 
   const calculateMatchAverage = (auto: number, teleop: number, hang: number) => {
-    return ((auto + teleop + hang) / 3).toFixed(1);
+    const average = (auto + teleop + hang) / 3;
+    return average.toFixed(1);
   };
 
   const isOurTeam = (teamNumber: string) => {
