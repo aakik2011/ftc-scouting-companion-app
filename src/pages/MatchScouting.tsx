@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Trophy, Users, Target, BarChart3, Plus, Trash2 } from 'lucide-react';
+import MatchCard from '@/components/MatchCard';
 
 interface Match {
   id: string;
@@ -40,6 +41,13 @@ const MatchScouting = () => {
     blueScore3: '',
     notes: '',
   });
+
+  // Sample upcoming matches
+  const upcomingMatches = [
+    { id: '1', matchNumber: 'Q1', teams: ['Team 254', 'Team 1678', 'Team 973', 'Team 2056'], status: 'upcoming' as const },
+    { id: '2', matchNumber: 'Q2', teams: ['Team 148', 'Team 1323', 'Team 2471', 'Team 5940'], status: 'upcoming' as const },
+    { id: '3', matchNumber: 'Q3', teams: ['Team 3476', 'Team 4414', 'Team 6328', 'Team 7129'], status: 'in-progress' as const },
+  ];
 
   useEffect(() => {
     const savedData = localStorage.getItem('matchScoutingData');
@@ -138,6 +146,19 @@ const MatchScouting = () => {
       </div>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
+        {/* Upcoming Matches Schedule */}
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+            <Target className="w-5 h-5 mr-2" />
+            Upcoming Matches
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {upcomingMatches.map((match) => (
+              <MatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        </div>
+
         {/* Add New Match Form */}
         <Card className="p-6 border-2 border-orange-100">
           <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
