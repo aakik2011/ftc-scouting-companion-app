@@ -136,9 +136,10 @@ const MatchScouting = () => {
     if (field === 'matchNumber' || field === 'redTeam1' || field === 'redTeam2' || field === 'blueTeam1' || field === 'blueTeam2') {
       updatedMatches[index][field] = value;
     } else {
-      // Handle numeric fields with proper validation
-      const numericValue = Math.max(0, Math.min(5, parseInt(value) || 0));
-      (updatedMatches[index] as any)[field] = numericValue;
+      // Handle numeric fields - allow empty string or valid numbers 0-5
+      if (value === '' || value === '0' || value === '1' || value === '2' || value === '3' || value === '4' || value === '5') {
+        (updatedMatches[index] as any)[field] = value === '' ? 0 : parseInt(value);
+      }
     }
     
     setMatches(updatedMatches);
@@ -314,31 +315,40 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.redTeam1Auto.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam1Auto', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam1Auto', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam1Teleop.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam1Teleop', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam1Teleop', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam1Hang.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam1Hang', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam1Hang', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -350,31 +360,40 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.redTeam2Auto.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam2Auto', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam2Auto', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam2Teleop.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam2Teleop', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam2Teleop', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.redTeam2Hang.toString()}
-                        onChange={(e) => updateMatch(index, 'redTeam2Hang', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'redTeam2Hang', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -404,31 +423,40 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.blueTeam1Auto.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Auto', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam1Auto', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam1Teleop.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Teleop', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam1Teleop', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam1Hang.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam1Hang', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam1Hang', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
@@ -440,31 +468,40 @@ const MatchScouting = () => {
                     <TableCell>
                       <Input
                         value={match.blueTeam2Auto.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Auto', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam2Auto', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam2Teleop.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Teleop', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam2Teleop', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell>
                       <Input
                         value={match.blueTeam2Hang.toString()}
-                        onChange={(e) => updateMatch(index, 'blueTeam2Hang', e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '' || /^[0-5]$/.test(value)) {
+                            updateMatch(index, 'blueTeam2Hang', value);
+                          }
+                        }}
                         className="w-16"
-                        type="number"
-                        min="0"
-                        max="5"
+                        maxLength={1}
                       />
                     </TableCell>
                     <TableCell className="font-medium">
