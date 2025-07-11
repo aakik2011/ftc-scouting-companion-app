@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
@@ -452,17 +451,23 @@ const MatchScouting = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {[match.redTeam1, match.redTeam2].filter(team => team.trim()).map(team => (
-                            <TableRow key={team}>
-                              <TableCell className="font-medium">{team}</TableCell>
+                          {[
+                            { team: match.redTeam1, label: 'Red Team 1' },
+                            { team: match.redTeam2, label: 'Red Team 2' }
+                          ].map(({ team, label }) => (
+                            <TableRow key={`${matchIndex}-${label}`}>
+                              <TableCell className="font-medium">
+                                {team.trim() || `${label} (Empty)`}
+                              </TableCell>
                               <TableCell>
                                 <Input
                                   type="number"
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.auto || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'auto', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -471,8 +476,9 @@ const MatchScouting = () => {
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.teleop || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'teleop', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -481,8 +487,9 @@ const MatchScouting = () => {
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.hang || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'hang', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -492,7 +499,7 @@ const MatchScouting = () => {
                               </TableCell>
                               <TableCell>
                                 <Badge className="bg-red-100 text-red-800">
-                                  {calculateTotalAverage(team)}
+                                  {team.trim() ? calculateTotalAverage(team) : 0}
                                 </Badge>
                               </TableCell>
                             </TableRow>
@@ -520,17 +527,23 @@ const MatchScouting = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {[match.blueTeam1, match.blueTeam2].filter(team => team.trim()).map(team => (
-                            <TableRow key={team}>
-                              <TableCell className="font-medium">{team}</TableCell>
+                          {[
+                            { team: match.blueTeam1, label: 'Blue Team 1' },
+                            { team: match.blueTeam2, label: 'Blue Team 2' }
+                          ].map(({ team, label }) => (
+                            <TableRow key={`${matchIndex}-${label}`}>
+                              <TableCell className="font-medium">
+                                {team.trim() || `${label} (Empty)`}
+                              </TableCell>
                               <TableCell>
                                 <Input
                                   type="number"
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.auto || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'auto', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -539,8 +552,9 @@ const MatchScouting = () => {
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.teleop || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'teleop', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -549,8 +563,9 @@ const MatchScouting = () => {
                                   min="0"
                                   max="5"
                                   value={match.scores[team]?.hang || 0}
-                                  onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
+                                  onChange={(e) => updateScore(matchIndex, team || label, 'hang', e.target.value)}
                                   className="w-16"
+                                  disabled={!team.trim()}
                                 />
                               </TableCell>
                               <TableCell>
@@ -560,7 +575,7 @@ const MatchScouting = () => {
                               </TableCell>
                               <TableCell>
                                 <Badge className="bg-blue-100 text-blue-800">
-                                  {calculateTotalAverage(team)}
+                                  {team.trim() ? calculateTotalAverage(team) : 0}
                                 </Badge>
                               </TableCell>
                             </TableRow>
