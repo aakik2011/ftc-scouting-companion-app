@@ -43,6 +43,7 @@ interface MatchData {
 const MatchScouting = () => {
   const navigate = useNavigate();
   const [isSetupComplete, setIsSetupComplete] = useState(false);
+  const [isScheduleFinalized, setIsScheduleFinalized] = useState(false);
   const [matchSetup, setMatchSetup] = useState<MatchSetup>({
     totalMatches: 0,
     ourTeam: '',
@@ -57,6 +58,7 @@ const MatchScouting = () => {
   useEffect(() => {
     const savedSetup = localStorage.getItem('matchScoutingSetup');
     const savedData = localStorage.getItem('matchScoutingData');
+    const savedFinalized = localStorage.getItem('matchScoutingFinalized');
     
     if (savedSetup) {
       const setup = JSON.parse(savedSetup);
@@ -66,6 +68,10 @@ const MatchScouting = () => {
     
     if (savedData) {
       setMatchData(JSON.parse(savedData));
+    }
+
+    if (savedFinalized) {
+      setIsScheduleFinalized(JSON.parse(savedFinalized));
     }
   }, []);
 
@@ -103,6 +109,8 @@ const MatchScouting = () => {
   };
 
   const finalizeSchedule = () => {
+    console.log('Finalizing schedule with matches:', matchSetup.matches);
+    
     const initialMatchData: MatchData[] = matchSetup.matches.map(match => ({
       ...match,
       scores: {}
@@ -126,8 +134,12 @@ const MatchScouting = () => {
       });
     });
 
+    console.log('Created initial match data:', initialMatchData);
+    
     setMatchData(initialMatchData);
+    setIsScheduleFinalized(true);
     localStorage.setItem('matchScoutingData', JSON.stringify(initialMatchData));
+    localStorage.setItem('matchScoutingFinalized', JSON.stringify(true));
   };
 
   const updateScore = (matchIndex: number, teamNumber: string, field: 'auto' | 'teleop' | 'hang', value: string) => {
@@ -179,13 +191,16 @@ const MatchScouting = () => {
     if (window.confirm('Are you sure you want to reset all match scouting data?')) {
       localStorage.removeItem('matchScoutingSetup');
       localStorage.removeItem('matchScoutingData');
+      localStorage.removeItem('matchScoutingFinalized');
       setIsSetupComplete(false);
+      setIsScheduleFinalized(false);
       setMatchSetup({ totalMatches: 0, ourTeam: '', matches: [] });
       setMatchData([]);
       setSetupForm({ totalMatches: '', ourTeam: '' });
     }
   };
 
+  // Setup phase - initial competition setup
   if (!isSetupComplete) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
@@ -208,114 +223,138 @@ const MatchScouting = () => {
         </div>
 
         <div className="max-w-4xl mx-auto p-4">
-          {matchSetup.totalMatches === 0 ? (
-            <Card className="p-6">
-              <h2 className="text-xl font-bold mb-4">Competition Setup</h2>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="totalMatches">Total Number of Matches</Label>
-                  <Input
-                    id="totalMatches"
-                    type="number"
-                    min="1"
-                    value={setupForm.totalMatches}
-                    onChange={(e) => setSetupForm({ ...setupForm, totalMatches: e.target.value })}
-                    placeholder="Enter total matches (e.g., 12)"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="ourTeam">Our Team Number</Label>
-                  <Input
-                    id="ourTeam"
-                    value={setupForm.ourTeam}
-                    onChange={(e) => setSetupForm({ ...setupForm, ourTeam: e.target.value })}
-                    placeholder="Enter your team number"
-                  />
-                </div>
-                <Button onClick={handleSetupSubmit} className="w-full bg-orange-600 hover:bg-orange-700">
-                  Create Match Schedule
-                </Button>
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Competition Setup</h2>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="totalMatches">Total Number of Matches</Label>
+                <Input
+                  id="totalMatches"
+                  type="number"
+                  min="1"
+                  value={setupForm.totalMatches}
+                  onChange={(e) => setSetupForm({ ...setupForm, totalMatches: e.target.value })}
+                  placeholder="Enter total matches (e.g., 12)"
+                />
               </div>
-            </Card>
-          ) : (
-            <div className="space-y-6">
-              <Card className="p-6">
-                <h2 className="text-xl font-bold mb-4">Enter Team Schedule</h2>
-                <p className="text-gray-600 mb-4">
-                  Competition: {matchSetup.totalMatches} matches | Our Team: {matchSetup.ourTeam}
-                </p>
-                
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Match</TableHead>
-                        <TableHead className="text-red-600">Red Team 1</TableHead>
-                        <TableHead className="text-red-600">Red Team 2</TableHead>
-                        <TableHead className="text-blue-600">Blue Team 1</TableHead>
-                        <TableHead className="text-blue-600">Blue Team 2</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {matchSetup.matches.map((match, index) => (
-                        <TableRow key={match.matchNumber}>
-                          <TableCell className="font-medium">Q{match.matchNumber}</TableCell>
-                          <TableCell>
-                            <Input
-                              value={match.redTeam1}
-                              onChange={(e) => updateMatchTeam(index, 'redTeam1', e.target.value)}
-                              placeholder="Team #"
-                              className="w-20"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              value={match.redTeam2}
-                              onChange={(e) => updateMatchTeam(index, 'redTeam2', e.target.value)}
-                              placeholder="Team #"
-                              className="w-20"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              value={match.blueTeam1}
-                              onChange={(e) => updateMatchTeam(index, 'blueTeam1', e.target.value)}
-                              placeholder="Team #"
-                              className="w-20"
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <Input
-                              value={match.blueTeam2}
-                              onChange={(e) => updateMatchTeam(index, 'blueTeam2', e.target.value)}
-                              placeholder="Team #"
-                              className="w-20"
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                
-                <div className="flex gap-2 mt-4">
-                  <Button onClick={finalizeSchedule} className="bg-green-600 hover:bg-green-700">
-                    <Save className="w-4 h-4 mr-2" />
-                    Finalize Schedule
-                  </Button>
-                  <Button onClick={resetAllData} variant="destructive">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Reset Setup
-                  </Button>
-                </div>
-              </Card>
+              <div>
+                <Label htmlFor="ourTeam">Our Team Number</Label>
+                <Input
+                  id="ourTeam"
+                  value={setupForm.ourTeam}
+                  onChange={(e) => setSetupForm({ ...setupForm, ourTeam: e.target.value })}
+                  placeholder="Enter your team number"
+                />
+              </div>
+              <Button onClick={handleSetupSubmit} className="w-full bg-orange-600 hover:bg-orange-700">
+                Create Match Schedule
+              </Button>
             </div>
-          )}
+          </Card>
         </div>
       </div>
     );
   }
 
+  // Schedule entry phase
+  if (!isScheduleFinalized) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Match Schedule Entry</h1>
+                  <p className="text-sm text-gray-500">Enter the official competition schedule</p>
+                </div>
+              </div>
+              <Settings className="w-8 h-8 text-orange-600" />
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto p-4">
+          <Card className="p-6">
+            <h2 className="text-xl font-bold mb-4">Enter Team Schedule</h2>
+            <p className="text-gray-600 mb-4">
+              Competition: {matchSetup.totalMatches} matches | Our Team: {matchSetup.ourTeam}
+            </p>
+            
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Match</TableHead>
+                    <TableHead className="text-red-600">Red Team 1</TableHead>
+                    <TableHead className="text-red-600">Red Team 2</TableHead>
+                    <TableHead className="text-blue-600">Blue Team 1</TableHead>
+                    <TableHead className="text-blue-600">Blue Team 2</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {matchSetup.matches.map((match, index) => (
+                    <TableRow key={match.matchNumber}>
+                      <TableCell className="font-medium">Q{match.matchNumber}</TableCell>
+                      <TableCell>
+                        <Input
+                          value={match.redTeam1}
+                          onChange={(e) => updateMatchTeam(index, 'redTeam1', e.target.value)}
+                          placeholder="Team #"
+                          className="w-20"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={match.redTeam2}
+                          onChange={(e) => updateMatchTeam(index, 'redTeam2', e.target.value)}
+                          placeholder="Team #"
+                          className="w-20"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={match.blueTeam1}
+                          onChange={(e) => updateMatchTeam(index, 'blueTeam1', e.target.value)}
+                          placeholder="Team #"
+                          className="w-20"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          value={match.blueTeam2}
+                          onChange={(e) => updateMatchTeam(index, 'blueTeam2', e.target.value)}
+                          placeholder="Team #"
+                          className="w-20"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            
+            <div className="flex gap-2 mt-4">
+              <Button onClick={finalizeSchedule} className="bg-green-600 hover:bg-green-700">
+                <Save className="w-4 h-4 mr-2" />
+                Finalize Schedule & Start Scouting
+              </Button>
+              <Button onClick={resetAllData} variant="destructive">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Reset Setup
+              </Button>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Main scouting interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       {/* Header */}
@@ -391,147 +430,153 @@ const MatchScouting = () => {
         {/* Match Data Entry */}
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-gray-900">Match Data Entry</h2>
-          {matchData.map((match, matchIndex) => (
-            <Card key={match.matchNumber} className="p-4">
-              <h3 className="text-lg font-semibold mb-4">Match {match.matchNumber}</h3>
-              
-              {/* Red Alliance */}
-              <div className="mb-4">
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <h4 className="font-semibold text-red-700 mb-2">Red Alliance</h4>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Team</TableHead>
-                          <TableHead>Auto (0-5)</TableHead>
-                          <TableHead>Tele-op (0-5)</TableHead>
-                          <TableHead>Hang (0-5)</TableHead>
-                          <TableHead>Match Avg</TableHead>
-                          <TableHead>Total Avg</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[match.redTeam1, match.redTeam2].filter(team => team.trim()).map(team => (
-                          <TableRow key={team}>
-                            <TableCell className="font-medium">{team}</TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.auto || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.teleop || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.hang || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">
-                                {match.scores[team]?.matchAverage || 0}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className="bg-red-100 text-red-800">
-                                {calculateTotalAverage(team)}
-                              </Badge>
-                            </TableCell>
+          {matchData.length > 0 ? (
+            matchData.map((match, matchIndex) => (
+              <Card key={match.matchNumber} className="p-4">
+                <h3 className="text-lg font-semibold mb-4">Match {match.matchNumber}</h3>
+                
+                {/* Red Alliance */}
+                <div className="mb-4">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-red-700 mb-2">Red Alliance</h4>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Team</TableHead>
+                            <TableHead>Auto (0-5)</TableHead>
+                            <TableHead>Tele-op (0-5)</TableHead>
+                            <TableHead>Hang (0-5)</TableHead>
+                            <TableHead>Match Avg</TableHead>
+                            <TableHead>Total Avg</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {[match.redTeam1, match.redTeam2].filter(team => team.trim()).map(team => (
+                            <TableRow key={team}>
+                              <TableCell className="font-medium">{team}</TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.auto || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.teleop || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.hang || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary">
+                                  {match.scores[team]?.matchAverage || 0}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className="bg-red-100 text-red-800">
+                                  {calculateTotalAverage(team)}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Blue Alliance */}
-              <div>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <h4 className="font-semibold text-blue-700 mb-2">Blue Alliance</h4>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Team</TableHead>
-                          <TableHead>Auto (0-5)</TableHead>
-                          <TableHead>Tele-op (0-5)</TableHead>
-                          <TableHead>Hang (0-5)</TableHead>
-                          <TableHead>Match Avg</TableHead>
-                          <TableHead>Total Avg</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[match.blueTeam1, match.blueTeam2].filter(team => team.trim()).map(team => (
-                          <TableRow key={team}>
-                            <TableCell className="font-medium">{team}</TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.auto || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.teleop || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Input
-                                type="number"
-                                min="0"
-                                max="5"
-                                value={match.scores[team]?.hang || 0}
-                                onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
-                                className="w-16"
-                              />
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">
-                                {match.scores[team]?.matchAverage || 0}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge className="bg-blue-100 text-blue-800">
-                                {calculateTotalAverage(team)}
-                              </Badge>
-                            </TableCell>
+                {/* Blue Alliance */}
+                <div>
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <h4 className="font-semibold text-blue-700 mb-2">Blue Alliance</h4>
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Team</TableHead>
+                            <TableHead>Auto (0-5)</TableHead>
+                            <TableHead>Tele-op (0-5)</TableHead>
+                            <TableHead>Hang (0-5)</TableHead>
+                            <TableHead>Match Avg</TableHead>
+                            <TableHead>Total Avg</TableHead>
                           </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                        </TableHeader>
+                        <TableBody>
+                          {[match.blueTeam1, match.blueTeam2].filter(team => team.trim()).map(team => (
+                            <TableRow key={team}>
+                              <TableCell className="font-medium">{team}</TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.auto || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'auto', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.teleop || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'teleop', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max="5"
+                                  value={match.scores[team]?.hang || 0}
+                                  onChange={(e) => updateScore(matchIndex, team, 'hang', e.target.value)}
+                                  className="w-16"
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="secondary">
+                                  {match.scores[team]?.matchAverage || 0}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Badge className="bg-blue-100 text-blue-800">
+                                  {calculateTotalAverage(team)}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Card>
+            ))
+          ) : (
+            <Card className="p-8 text-center">
+              <p className="text-gray-500">No match data available. Please complete the schedule setup first.</p>
             </Card>
-          ))}
+          )}
         </div>
       </div>
     </div>
