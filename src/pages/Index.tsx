@@ -48,7 +48,7 @@ const Index = () => {
                 Aakarsh Kachalia
               </p>
               <p className="text-base text-orange-600 font-medium">
-                FTC Team 7083
+                FTC Team 7083 TundraBots
               </p>
             </div>
             
