@@ -42,6 +42,16 @@ const Index = () => {
               <span className="block text-3xl lg:text-4xl text-gray-600 font-medium">Companion</span>
             </h1>
             
+            {/* User Info */}
+            <div className="mb-4">
+              <p className="text-lg font-semibold text-blue-700">
+                Aakarsh Kachalia
+              </p>
+              <p className="text-base text-orange-600 font-medium">
+                FTC Team 7083
+              </p>
+            </div>
+            
             {/* Subtitle */}
             <p className="text-lg lg:text-xl text-gray-600 mb-2">
               Professional Robotics Competition Analysis
